@@ -20,12 +20,12 @@ BEGIN {
   }
 }
 
-use TWiki::Contrib::Build;
+use Foswiki::Contrib::Build;
 
 # Declare our build package
 { package MailerBuild;
 
-  @MailerBuild::ISA = ( "TWiki::Contrib::Build" );
+  @MailerBuild::ISA = ( "Foswiki::Contrib::Build" );
 
   sub new {
     my $class = shift;

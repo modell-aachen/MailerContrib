@@ -8,5 +8,5 @@
 # it something that will never match, e.g. ='^notAnEmail$'=).
 # If this is not defined, then the default setting of
 # =[A-Za-z0-9.+-_]+\@[A-Za-z0-9.-]+= is used.
-$TWiki::cfg{MailerContrib}{EmailFilterIn} = '';
+$Foswiki::cfg{MailerContrib}{EmailFilterIn} = '';
 

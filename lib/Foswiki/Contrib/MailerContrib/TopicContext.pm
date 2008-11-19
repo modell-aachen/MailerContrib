@@ -1,9 +1,9 @@
 # Replacement for pushTopicContext in older TWikis. Does the minimum needed
 # by MailerContrib.
 
-sub TWiki::Func::pushTopicContext {
+sub Foswiki::Func::pushTopicContext {
     my( $web, $topic ) = @_;
-    my $twiki = $TWiki::Plugins::SESSION;
+    my $twiki = $Foswiki::Plugins::SESSION;
     my( $web, $topic ) = $twiki->normalizeWebTopicName( @_ );
     my $old = {
         web => $twiki->{webName},
@@ -19,8 +19,8 @@ sub TWiki::Func::pushTopicContext {
         'SESSION', $twiki->{loginManager}->getSessionValues() );
 }
 
-sub TWiki::Func::popTopicContext {
-    my $twiki = $TWiki::Plugins::SESSION;
+sub Foswiki::Func::popTopicContext {
+    my $twiki = $Foswiki::Plugins::SESSION;
     my $old = pop( @{$twiki->{_FUNC_PREFS_STACK}} );
     $twiki->{prefs}->restore( $old->{mark});
     $twiki->{webName} = $old->{web};
