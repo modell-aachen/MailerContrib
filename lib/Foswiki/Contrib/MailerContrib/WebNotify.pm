@@ -1,8 +1,8 @@
 # Module of Foswiki - The Free Open Source Wiki, http://foswiki.org/
 #
 # Copyright (C) 2004 Wind River Systems Inc.
-# Copyright (C) 1999-2007 TWiki Contributors.
-# All Rights Reserved. TWiki Contributors
+# Copyright (C) 1999-2007 Foswiki Contributors.
+# All Rights Reserved. Foswiki Contributors
 # are listed in the AUTHORS file in the root of this distribution.
 # NOTE: Please extend that file, not this notice.
 #
@@ -20,25 +20,25 @@
 
 =pod
 
----+ package TWiki::Contrib::MailerContrib::WebNotify
+---+ package Foswiki::Contrib::MailerContrib::WebNotify
 Object that represents the contents of a %NOTIFYTOPIC% topic in a TWiki web.
 
-Note that =$TWiki::Plugins::SESSION= is used to find the TWiki session, and
+Note that =$Foswiki::Plugins::SESSION= is used to find the TWiki session, and
 must be set up before this class is used.
 
 =cut
 
-package TWiki::Contrib::MailerContrib::WebNotify;
+package Foswiki::Contrib::MailerContrib::WebNotify;
 
 use strict;
 use locale; # required for matching \w with international characters
 
 use Assert;
 
-require TWiki::Func;
-require TWiki::Contrib::MailerContrib;
-require TWiki::Contrib::MailerContrib::Subscriber;
-require TWiki::Contrib::MailerContrib::Subscription;
+require Foswiki::Func;
+require Foswiki::Contrib::MailerContrib;
+require Foswiki::Contrib::MailerContrib::Subscriber;
+require Foswiki::Contrib::MailerContrib::Subscription;
 
 =pod
 
@@ -61,16 +61,16 @@ sub new {
     my $this = bless( {}, $class );
 
     # Ensure the contrib is initialised
-    TWiki::Contrib::MailerContrib::initContrib();
+    Foswiki::Contrib::MailerContrib::initContrib();
 
     $this->{web} = $web;
-    $this->{topic} = $topic || $TWiki::cfg{NotifyTopicName} || 'WebNotify';
+    $this->{topic} = $topic || $Foswiki::cfg{NotifyTopicName} || 'WebNotify';
     $this->{pretext} = '';
     $this->{posttext} = '';
     $this->{session} = $session;
     $this->{noexpandgroups} = $noexpandgroups;
 
-    if( TWiki::Func::topicExists( $web, $topic )) {
+    if( Foswiki::Func::topicExists( $web, $topic )) {
         $this->_load();
     }
 
@@ -88,7 +88,7 @@ the method will throw an exception.
 
 sub writeWebNotify {
     my $this = shift;
-    TWiki::Func::saveTopicText(
+    Foswiki::Func::saveTopicText(
         $this->{web},
         $this->{topic},
         $this->stringify(),
@@ -113,7 +113,7 @@ sub getSubscriber {
     my $subscriber = $this->{subscribers}{$name};
     unless ( $noAdd || defined( $subscriber )) {
         $subscriber =
-          new TWiki::Contrib::MailerContrib::Subscriber( $name );
+          new Foswiki::Contrib::MailerContrib::Subscriber( $name );
         $this->{subscribers}{$name} = $subscriber;
     }
     return $subscriber;
@@ -150,8 +150,8 @@ sub subscribe {
 
     my @names = ($name);
     unless ($this->{noexpandgroups}) {
-        if (defined &TWiki::Func::eachGroupMember) {
-            my $it = TWiki::Func::eachGroupMember( $name );
+        if (defined &Foswiki::Func::eachGroupMember) {
+            my $it = Foswiki::Func::eachGroupMember( $name );
             if( $it ) {
                 @names = ();
                 while( $it->hasNext() ) {
@@ -160,7 +160,7 @@ sub subscribe {
                 }
             }
         } else {
-            my $user = TWiki::User->new($this->{session}, '', $name);
+            my $user = Foswiki::User->new($this->{session}, '', $name);
             if ($user->isGroup) {
                 @names = map {$_->wikiName} @{$user->groupMembers};
             }
@@ -169,7 +169,7 @@ sub subscribe {
 
     foreach my $n (@names) {
         my $subscriber = $this->getSubscriber( $n );
-        my $sub = new TWiki::Contrib::MailerContrib::Subscription(
+        my $sub = new Foswiki::Contrib::MailerContrib::Subscription(
             $topics, $depth, $opts );
         $subscriber->subscribe( $sub );
     }
@@ -192,8 +192,8 @@ sub unsubscribe {
 
     my @names = ( $name );
     unless ($this->{noexpandgroups}) {
-        if (defined &TWiki::Func::eachGroupMember) {
-            my $it = TWiki::Func::eachGroupMember( $name );
+        if (defined &Foswiki::Func::eachGroupMember) {
+            my $it = Foswiki::Func::eachGroupMember( $name );
             if( $it ) {
                 @names = ();
                 while( $it->hasNext() ) {
@@ -202,7 +202,7 @@ sub unsubscribe {
                 }
             }
         } else {
-            my $user = TWiki::User->new($this->{session}, '', $name);
+            my $user = Foswiki::User->new($this->{session}, '', $name);
             if ($user->isGroup) {
                 @names = map {$_->wikiName} @{$user->groupMembers};
             }
@@ -211,7 +211,7 @@ sub unsubscribe {
 
     foreach my $n (@names) {
         my $subscriber = $this->getSubscriber( $n );
-        my $sub = new TWiki::Contrib::MailerContrib::Subscription(
+        my $sub = new Foswiki::Contrib::MailerContrib::Subscription(
             $topics, $depth, 0 );
         $subscriber->unsubscribe( $sub );
     }
@@ -246,8 +246,8 @@ sub stringify {
 =pod
 
 ---++ processChange($change, $db, $changeSet, $seenSet, $allSet)
-   * =$change= - ref of a TWiki::Contrib::Mailer::Change
-   * =$db= - TWiki::Contrib::MailerContrib::UpData database of parent references
+   * =$change= - ref of a Foswiki::Contrib::Mailer::Change
+   * =$db= - Foswiki::Contrib::MailerContrib::UpData database of parent references
    * =$changeSet= - ref of a hash mapping emails to sets of changes
    * =$seenSet= - ref of a hash recording indices of topics already seen
    * =$allSet= - ref of a hash that maps topics to email addresses for news subscriptions
@@ -263,7 +263,7 @@ sub processChange {
     my $topic = $change->{TOPIC};
     my $web = $change->{WEB};
     my %authors = map { $_ => 1 }
-      @{TWiki::Contrib::MailerContrib::Subscriber::getEmailAddressesForUser(
+      @{Foswiki::Contrib::MailerContrib::Subscriber::getEmailAddressesForUser(
           $change->{author})};
 
     foreach my $name ( keys %{$this->{subscribers}} ) {
@@ -271,7 +271,7 @@ sub processChange {
         my $subs = $subscriber->isSubscribedTo( $topic, $db );
         if ($subs && !$subscriber->isUnsubscribedFrom( $topic, $db )) {
 
-            next unless TWiki::Func::checkAccessPermission(
+            next unless Foswiki::Func::checkAccessPermission(
                 'VIEW', $name, undef, $topic, $this->{web}, undef );
 
             my $emails = $subscriber->getEmailAddresses();
@@ -305,7 +305,7 @@ sub processChange {
 
 ---++ processCompulsory($topic, $db, \%allSet)
    * =$topic= - topic name
-   * =$db= - TWiki::Contrib::MailerContrib::UpData database of parent references
+   * =$db= - Foswiki::Contrib::MailerContrib::UpData database of parent references
    * =\%allSet= - ref of a hash that maps topics to email addresses for news subscriptions
 
 =cut
@@ -345,7 +345,7 @@ sub isEmpty {
 sub _load {
     my $this = shift;
 
-    my ( $meta, $text ) = TWiki::Func::readTopic(
+    my ( $meta, $text ) = Foswiki::Func::readTopic(
         $this->{web}, $this->{topic} );
     my $in_pre = 1;
     $this->{pretext} = '';
@@ -353,18 +353,18 @@ sub _load {
     $this->{meta} = $meta;
     # join \ terminated lines
     $text =~ s/\\\r?\n//gs;
-    my $webRE = qr/(?:$TWiki::cfg{UsersWebName}\.)?/o;
+    my $webRE = qr/(?:$Foswiki::cfg{UsersWebName}\.)?/o;
     foreach my $baseline ( split ( /\r?\n/, $text )) {
-        my $line = TWiki::Func::expandCommonVariables(
+        my $line = Foswiki::Func::expandCommonVariables(
             $baseline, $this->{topic}, $this->{web}, $meta);
-        if( $line =~ /^\s+\*\s$webRE($TWiki::regex{wikiWordRegex})\s+\-\s+($TWiki::cfg{MailerContrib}{EmailFilterIn}+)\s*$/o
-              && $1 ne $TWiki::cfg{DefaultUserWikiName}) {
+        if( $line =~ /^\s+\*\s$webRE($Foswiki::regex{wikiWordRegex})\s+\-\s+($Foswiki::cfg{MailerContrib}{EmailFilterIn}+)\s*$/o
+              && $1 ne $Foswiki::cfg{DefaultUserWikiName}) {
             # Main.WikiName - email@domain (legacy format)
             $this->subscribe( $2, '*', 0, 0 );
             $in_pre = 0;
         }
-        elsif ( $line =~ /^\s+\*\s$webRE($TWiki::regex{wikiWordRegex}|'.*?'|".*?"|$TWiki::cfg{MailerContrib}{EmailFilterIn})\s*(:.*)?$/o
-                  && $1 ne $TWiki::cfg{DefaultUserWikiName}) {
+        elsif ( $line =~ /^\s+\*\s$webRE($Foswiki::regex{wikiWordRegex}|'.*?'|".*?"|$Foswiki::cfg{MailerContrib}{EmailFilterIn})\s*(:.*)?$/o
+                  && $1 ne $Foswiki::cfg{DefaultUserWikiName}) {
             my $subscriber = $1;
             # Get the topic list from the last bracket matched. Have to do it
             # this awkward way because the email filter may contain braces
@@ -396,9 +396,9 @@ sub parsePageSubscriptions {
     
     $this->{topicSub} = \&_subscribeTopic;
     
-    my $ret = TWiki::Contrib::MailerContrib::parsePageList($this, $who, $spec, $unsubscribe);
+    my $ret = Foswiki::Contrib::MailerContrib::parsePageList($this, $who, $spec, $unsubscribe);
     if ( $ret =~ m/\S/ ) {
-        TWiki::Func::writeWarning(
+        Foswiki::Func::writeWarning(
             "Badly formatted page list at $who: $spec");
 	return -1;
     }
@@ -408,7 +408,7 @@ sub parsePageSubscriptions {
 sub _subscribeTopic {
     my ( $this, $who, $unsubscribe, $webTopic, $options, $childDepth ) = @_;
     
-    my ($web, $topic) = TWiki::Func::normalizeWebTopicName($this->{web}, $webTopic);
+    my ($web, $topic) = Foswiki::Func::normalizeWebTopicName($this->{web}, $webTopic);
     
 #print STDERR "_subscribeTopic($topic)\n";
     my $opts = 0;
@@ -437,7 +437,7 @@ sub _emailWarn {
     # Topic we are notifying on.
     unless (defined $this->{nomail}{$name}) {
         $this->{nomail}{$name} = 1;
-        TWiki::Func::writeWarning(
+        Foswiki::Func::writeWarning(
             "Failed to find permitted email for '".
               $subscriber->stringify()."' when processing web '$web'");
     }

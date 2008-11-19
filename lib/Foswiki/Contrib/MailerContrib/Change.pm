@@ -1,8 +1,8 @@
 # Module of Foswiki - The Free Open Source Wiki, http://foswiki.org/
 #
 # Copyright (C) 2004 Wind River Systems Inc.
-# Copyright (C) 1999-2006 TWiki Contributors.
-# All Rights Reserved. TWiki Contributors
+# Copyright (C) 1999-2006 Foswiki Contributors.
+# All Rights Reserved. Foswiki Contributors
 # are listed in the AUTHORS file in the root of this distribution.
 # NOTE: Please extend that file, not this notice.
 #
@@ -22,14 +22,14 @@ use strict;
 
 =pod
 
----+ package TWiki::Contrib::MailerContrib::Change
+---+ package Foswiki::Contrib::MailerContrib::Change
 Object that represents a change to a topic.
 
 =cut
 
-package TWiki::Contrib::MailerContrib::Change;
+package Foswiki::Contrib::MailerContrib::Change;
 
-use TWiki;
+use Foswiki;
 
 use URI::Escape;
 use Assert;
@@ -56,11 +56,11 @@ sub new {
     $this->{TOPIC} = $topic;
     my $user;
     # SMELL: call to unpublished core function
-    if (defined(&TWiki::Users::findUser)) {
+    if (defined(&Foswiki::Users::findUser)) {
         $user = $session->{users}->findUser( $author, undef, 1 );
         $this->{AUTHOR} = $user ? $user->wikiName() : $author;
     } else {
-        $this->{AUTHOR} = TWiki::Func::getWikiName($author);
+        $this->{AUTHOR} = Foswiki::Func::getWikiName($author);
     }
     $this->{TIME} = $time;
     ASSERT($rev) if DEBUG;
@@ -89,8 +89,8 @@ record is a reflection of both changes.
 
 sub merge {
     my( $this, $other ) = @_;
-    ASSERT($this->isa( 'TWiki::Contrib::MailerContrib::Change' )) if DEBUG;
-    ASSERT($other->isa( 'TWiki::Contrib::MailerContrib::Change' )) if DEBUG;
+    ASSERT($this->isa( 'Foswiki::Contrib::MailerContrib::Change' )) if DEBUG;
+    ASSERT($other->isa( 'Foswiki::Contrib::MailerContrib::Change' )) if DEBUG;
 
     if( $other->{CURR_REV} > $this->{CURR_REV} ) {
         $this->{CURR_REV} = $other->{CURR_REV};
@@ -118,9 +118,9 @@ sub expandHTML {
     my ( $this, $html ) = @_;
 
     unless( defined $this->{HTML_SUMMARY} ) {
-        if( defined &TWiki::Func::summariseChanges ) {
+        if( defined &Foswiki::Func::summariseChanges ) {
             $this->{HTML_SUMMARY} =
-              TWiki::Func::summariseChanges(
+              Foswiki::Func::summariseChanges(
                   $this->{WEB}, $this->{TOPIC}, $this->{BASE_REV},
                   $this->{CURR_REV}, 1 );
         } else {
@@ -133,7 +133,7 @@ sub expandHTML {
 
     $html =~ s/%TOPICNAME%/$this->{TOPIC}/g;
     $html =~ s/%AUTHOR%/$this->{AUTHOR}/g;
-    my $tim =  TWiki::Time::formatTime( $this->{TIME} );
+    my $tim =  Foswiki::Time::formatTime( $this->{TIME} );
     $html =~ s/%TIME%/$tim/go;
     $html =~ s/%CUR_REV%/$this->{CURR_REV}/g;
     $html =~ s/%BASE_REV%/$this->{BASE_REV}/g;
@@ -148,9 +148,9 @@ sub expandHTML {
         }
     }
     $html =~ s/%REVISION%/$frev/g;
-    $html = TWiki::Func::expandCommonVariables(
+    $html = Foswiki::Func::expandCommonVariables(
         $html, $this->{TOPIC}, $this->{WEB} );
-    $html = TWiki::Func::renderText( $html );
+    $html = Foswiki::Func::renderText( $html );
     $html =~ s/%TEXTHEAD%/$this->{HTML_SUMMARY}/g;
 
     return $html;
@@ -168,8 +168,8 @@ sub expandPlain {
 
     unless( defined $this->{TEXT_SUMMARY} ) {
         my $s;
-        if( defined &TWiki::Func::summariseChanges ) {
-            $s = TWiki::Func::summariseChanges(
+        if( defined &Foswiki::Func::summariseChanges ) {
+            $s = Foswiki::Func::summariseChanges(
                 $this->{WEB}, $this->{TOPIC}, $this->{BASE_REV},
                 $this->{CURR_REV}, 0 );
         } else {
@@ -182,7 +182,7 @@ sub expandPlain {
         $this->{TEXT_SUMMARY} = $s;
     }
 
-    my $tim =  TWiki::Time::formatTime( $this->{TIME} );
+    my $tim =  Foswiki::Time::formatTime( $this->{TIME} );
 
     # URL-encode topic names for use of I18N topic names in plain text
     # DEPRECATED! DO NOT USE!

@@ -27,13 +27,13 @@ sub next {
     return $n;
 }
 
-package TWiki::Func;
+package Foswiki::Func;
 
 sub eachChangeSince {
     my ($web, $since) = @_;
 
     my $changes;
-    if( open(F, "<$TWiki::cfg{DataDir}/$web/.changes")) {
+    if( open(F, "<$Foswiki::cfg{DataDir}/$web/.changes")) {
         local $/ = undef;
         $changes = <F>;
         close(F);

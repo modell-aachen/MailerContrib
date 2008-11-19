@@ -1,8 +1,8 @@
 # Module of Foswiki - The Free Open Source Wiki, http://foswiki.org/
 #
 # Copyright (C) 2004 Wind River Systems Inc.
-# Copyright (C) 1999-2006 TWiki Contributors.
-# All Rights Reserved. TWiki Contributors
+# Copyright (C) 1999-2006 Foswiki Contributors.
+# All Rights Reserved. Foswiki Contributors
 # are listed in the AUTHORS file in the root of this distribution.
 # NOTE: Please extend that file, not this notice.
 #
@@ -13,7 +13,7 @@ use strict;
 
 =pod
 
----+ package TWiki::Contrib::MailerContrib::Subscription
+---+ package Foswiki::Contrib::MailerContrib::Subscription
 Object that represents a single subscription of a user to
 notification on a page. A subscription is expressed as a page
 spec (which may contain wildcards) and a depth of children of
@@ -21,11 +21,11 @@ matching pages that the user is subscribed to.
 
 =cut
 
-package TWiki::Contrib::MailerContrib::Subscription;
+package Foswiki::Contrib::MailerContrib::Subscription;
 
 use Assert;
 
-use TWiki::Contrib::MailerContrib::Constants;
+use Foswiki::Contrib::MailerContrib::Constants;
 
 =pod
 
@@ -77,7 +77,7 @@ sub stringify {
 
 ---++ matches($topic, $db, $depth) -> boolean
    * =$topic= - Topic object we are checking
-   * =$db= - TWiki::Contrib::MailerContrib::UpData database of parent names
+   * =$db= - Foswiki::Contrib::MailerContrib::UpData database of parent names
    * =$depth= - If non-zero, check if the parent of the given topic matches as well. undef = 0.
 Check if we match this topic. Recurses up the parenthood tree seeing if
 this is a child of a parent that matches within the depth range.
@@ -108,7 +108,7 @@ sub matches {
 
 ---++ covers($other, $db) -> $boolean
    * =$other= - Other subscription object we are checking
-   * =$db= - TWiki::Contrib::MailerContrib::UpData database of parent names
+   * =$db= - Foswiki::Contrib::MailerContrib::UpData database of parent names
 Return true if this subscription already covers all the topics
 specified by another subscription. Thus:
    * A&#2A;B _covers_ AB, AxB

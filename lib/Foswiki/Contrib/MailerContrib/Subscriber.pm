@@ -1,8 +1,8 @@
 # Module of Foswiki - The Free Open Source Wiki, http://foswiki.org/
 #
 # Copyright (C) 2004 Wind River Systems Inc.
-# Copyright (C) 1999-2006 TWiki Contributors.
-# All Rights Reserved. TWiki Contributors
+# Copyright (C) 1999-2006 Foswiki Contributors.
+# All Rights Reserved. Foswiki Contributors
 # are listed in the AUTHORS file in the root of this distribution.
 # NOTE: Please extend that file, not this notice.
 #
@@ -22,7 +22,7 @@ use strict;
 
 =pod
 
----+ package TWiki::Contrib::MailerContrib::Subscriber
+---+ package Foswiki::Contrib::MailerContrib::Subscriber
 Object that represents a subscriber to notification. A subscriber is
 a name (which may be a wikiName or an email address) and a list of
 subscriptions which describe the topis subscribed to, and
@@ -32,13 +32,13 @@ name may also be a group, so it may expand to many email addresses.
 
 =cut
 
-package TWiki::Contrib::MailerContrib::Subscriber;
+package Foswiki::Contrib::MailerContrib::Subscriber;
 
-use TWiki;
-use TWiki::Plugins;
+use Foswiki;
+use Foswiki::Plugins;
 use Assert;
 
-require TWiki::Contrib::MailerContrib::WebNotify;
+require Foswiki::Contrib::MailerContrib::WebNotify;
 
 =pod
 
@@ -86,10 +86,10 @@ sub getEmailAddressesForUser {
 
     return $emails unless $name;
 
-    if ( $name =~ /^$TWiki::cfg{MailerContrib}{EmailFilterIn}$/ ) {
+    if ( $name =~ /^$Foswiki::cfg{MailerContrib}{EmailFilterIn}$/ ) {
         push( @{$emails}, $name );
     } else {
-        my $users = $TWiki::Plugins::SESSION->{users};
+        my $users = $Foswiki::Plugins::SESSION->{users};
         if ($users->can('findUserByWikiName')) {
             # User is represented by a wikiname. Map to a canonical
             # userid.
@@ -209,7 +209,7 @@ sub unsubscribe {
 
 ---++ isSubscribedTo($topic, $db) -> $subscription
    * =$topic= - Topic object we are checking
-   * =$db= - TWiki::Contrib::MailerContrib::UpData database of parents
+   * =$db= - Foswiki::Contrib::MailerContrib::UpData database of parents
 Check if we have a subscription to the given topic. Return the subscription
 that matches if we do, undef otherwise.
 
@@ -231,7 +231,7 @@ sub isSubscribedTo {
 
 ---++ isUnsubscribedFrom($topic) -> $subscription
    * =$topic= - Topic object we are checking
-   * =$db= - TWiki::Contrib::MailerContrib::UpData database of parents
+   * =$db= - Foswiki::Contrib::MailerContrib::UpData database of parents
 Check if we have an unsubscription from the given topic. Return the subscription that matches if we do, undef otherwise.
 
 =cut
@@ -266,9 +266,9 @@ sub stringify {
     $unsubs = " - $unsubs" if $unsubs;
 
     my $name = $this->{name};
-    if ($name =~ /^$TWiki::regex{wikiWordRegex}$/) {
+    if ($name =~ /^$Foswiki::regex{wikiWordRegex}$/) {
         $name = '%USERSWEB%.'.$name;
-    } elsif ($name !~ /^$TWiki::cfg{MailerContrib}{EmailFilterIn})$/) {
+    } elsif ($name !~ /^$Foswiki::cfg{MailerContrib}{EmailFilterIn})$/) {
         $name = $name =~ /'/ ? '"'.$name.'"' : "'$name'";
     }
     return "   * " . $name . ": " .

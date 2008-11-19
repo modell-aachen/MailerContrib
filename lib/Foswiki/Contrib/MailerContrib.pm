@@ -1,8 +1,8 @@
 # Module of Foswiki - The Free Open Source Wiki, http://foswiki.org/
 #
 # Copyright (C) 2004 Wind River Systems Inc.
-# Copyright (C) 1999-2006 TWiki Contributors.
-# All Rights Reserved. TWiki Contributors
+# Copyright (C) 1999-2006 Foswiki Contributors.
+# All Rights Reserved. Foswiki Contributors
 # are listed in the AUTHORS file in the root of this distribution.
 # NOTE: Please extend that file, not this notice.
 #
@@ -20,7 +20,7 @@
 
 =pod
 
----+ package TWiki::Contrib::MailerContrib
+---+ package Foswiki::Contrib::MailerContrib
 
 Package of support for extended Web<nop>Notify notification, supporting per-topic notification and notification of changes to children.
 
@@ -28,20 +28,20 @@ Also supported is a simple API that can be used to change the Web<nop>Notify top
 
 =cut
 
-package TWiki::Contrib::MailerContrib;
+package Foswiki::Contrib::MailerContrib;
 
 use strict;
 
 use URI;
 use CGI qw(-any);
 
-require TWiki;
-require TWiki::Plugins;
-require TWiki::Time;
-require TWiki::Func;
-require TWiki::Contrib::MailerContrib::WebNotify;
-require TWiki::Contrib::MailerContrib::Change;
-require TWiki::Contrib::MailerContrib::UpData;
+require Foswiki;
+require Foswiki::Plugins;
+require Foswiki::Time;
+require Foswiki::Func;
+require Foswiki::Contrib::MailerContrib::WebNotify;
+require Foswiki::Contrib::MailerContrib::Change;
+require Foswiki::Contrib::MailerContrib::UpData;
 
 use vars qw ( $VERSION $RELEASE $verbose );
 
@@ -50,8 +50,8 @@ $RELEASE = '15 Oct 2008';
 
 # PROTECTED STATIC ensure the contrib is initernally initialised
 sub initContrib {
-    $TWiki::cfg{MailerContrib}{EmailFilterIn} ||=
-      $TWiki::regex{emailAddrRegex};
+    $Foswiki::cfg{MailerContrib}{EmailFilterIn} ||=
+      $Foswiki::regex{emailAddrRegex};
 }
 
 =pod
@@ -89,12 +89,12 @@ sub mailNotify {
     $exwebstr =~ s/\*/\.\*/g;
 
     if (!defined $twiki) {
-        $twiki = new TWiki();
+        $twiki = new Foswiki();
     }
 
-    $TWiki::Plugins::SESSION = $twiki;
+    $Foswiki::Plugins::SESSION = $twiki;
 
-    my $context = TWiki::Func::getContext();
+    my $context = Foswiki::Func::getContext();
 
     $context->{command_line} = 1;
 
@@ -104,7 +104,7 @@ sub mailNotify {
     initContrib();
 
     my $report = '';
-    foreach my $web ( TWiki::Func::getListOfWebs( 'user ') ) {
+    foreach my $web ( Foswiki::Func::getListOfWebs( 'user ') ) {
        if ( $web =~ /^($webstr)$/ && $web !~ /^($exwebstr)$/ ) {
           $report .= _processWeb( $twiki, $web );
        }
@@ -123,10 +123,10 @@ sub changeSubscription {
     my ($defaultWeb, $who, $topicList, $unsubscribe) = @_;
 
     #we can get away with a normalise on a list of topics, so long as the list starts with a topic
-    my ($web, $t) = TWiki::Func::normalizeWebTopicName($defaultWeb, $topicList);
+    my ($web, $t) = Foswiki::Func::normalizeWebTopicName($defaultWeb, $topicList);
     #TODO: this limits us to subscribing to one web.
-    my $wn = new TWiki::Contrib::MailerContrib::WebNotify(
-        $TWiki::Plugins::SESSION, $web, $TWiki::cfg{NotifyTopicName}, 1 );
+    my $wn = new Foswiki::Contrib::MailerContrib::WebNotify(
+        $Foswiki::Plugins::SESSION, $web, $Foswiki::cfg{NotifyTopicName}, 1 );
     $wn->parsePageSubscriptions( $who, $topicList, $unsubscribe );
     $wn->writeWebNotify();
     return;
@@ -150,7 +150,7 @@ sub isSubscribedTo {
                         topicSub=>\&_isSubscribedToTopic
                     };
 
-    my $ret = TWiki::Contrib::MailerContrib::parsePageList($subscribed, $who, $topicList);
+    my $ret = Foswiki::Contrib::MailerContrib::parsePageList($subscribed, $who, $topicList);
     
     return (!defined($subscribed->{not_subscribed}) ||
                 (0 == scalar($subscribed->{not_subscribed})) );
@@ -158,14 +158,14 @@ sub isSubscribedTo {
 sub _isSubscribedToTopic {
     my ( $subscribed, $who, $unsubscribe, $topic, $options, $childDepth ) = @_;
     
-    require TWiki::Contrib::MailerContrib::WebNotify;
-    my ($sweb, $stopic) = TWiki::Func::normalizeWebTopicName($subscribed->{currentWeb}, $topic);
+    require Foswiki::Contrib::MailerContrib::WebNotify;
+    my ($sweb, $stopic) = Foswiki::Func::normalizeWebTopicName($subscribed->{currentWeb}, $topic);
 
     #TODO: extract this code so we only create $wn objects for each web once..    
-    my $wn = new TWiki::Contrib::MailerContrib::WebNotify( $TWiki::Plugins::SESSION, $sweb, $TWiki::cfg{NotifyTopicName} );
+    my $wn = new Foswiki::Contrib::MailerContrib::WebNotify( $Foswiki::Plugins::SESSION, $sweb, $Foswiki::cfg{NotifyTopicName} );
     my $subscriber = $wn->getSubscriber($who);
     
-    my $db = new TWiki::Contrib::MailerContrib::UpData( $TWiki::Plugins::SESSION, $sweb );
+    my $db = new Foswiki::Contrib::MailerContrib::UpData( $Foswiki::Plugins::SESSION, $sweb );
     #TODO: need to check $childDepth topics too (somehow)
     if ( $subscriber->isSubscribedTo($stopic, $db) &&
          (!$subscriber->isUnsubscribedFrom($stopic, $db))) {
@@ -206,7 +206,7 @@ sub parsePageList {
 sub _processWeb {
     my( $twiki, $web) = @_;
 
-    if( ! TWiki::Func::webExists( $web ) ) {
+    if( ! Foswiki::Func::webExists( $web ) ) {
 #        print STDERR "**** ERROR mailnotifier cannot find web $web\n";
         return '';
     }
@@ -216,14 +216,14 @@ sub _processWeb {
     my $report = '';
 
     # Read the webnotify and load subscriptions
-    my $wn = new TWiki::Contrib::MailerContrib::WebNotify(
-        $twiki, $web, $TWiki::cfg{NotifyTopicName} );
+    my $wn = new Foswiki::Contrib::MailerContrib::WebNotify(
+        $twiki, $web, $Foswiki::cfg{NotifyTopicName} );
     if ( $wn->isEmpty() ) {
         print "\t$web has no subscribers\n" if $verbose;
     } else {
         # create a DB object for parent pointers
         print $wn->stringify(1) if $verbose;
-        my $db = new TWiki::Contrib::MailerContrib::UpData( $twiki, $web );
+        my $db = new Foswiki::Contrib::MailerContrib::UpData( $twiki, $web );
         $report .= _processSubscriptions( $twiki, $web, $wn, $db );
     }
 
@@ -234,7 +234,7 @@ sub _processWeb {
 sub _processSubscriptions {
     my ( $twiki, $web, $notify, $db ) = @_;
 
-    my $metadir = TWiki::Func::getWorkArea('MailerContrib');
+    my $metadir = Foswiki::Func::getWorkArea('MailerContrib');
     my $notmeta = $web;
     $notmeta =~ s#/#.#g;
     $notmeta = "$metadir/$notmeta";
@@ -248,7 +248,7 @@ sub _processSubscriptions {
 
     if ( $verbose ) {
         print "\tLast notification was at " .
-          TWiki::Time::formatTime( $timeOfLastNotify, 'iso' ). "\n";
+          Foswiki::Time::formatTime( $timeOfLastNotify, 'iso' ). "\n";
     }
 
     my $timeOfLastChange = 0;
@@ -269,27 +269,27 @@ sub _processSubscriptions {
     # record simple newsletter subscriptions.
     my %allSet;
 
-    if( !defined( &TWiki::Func::eachChangeSince )) {
-        require TWiki::Contrib::MailerContrib::CompatibilityHacks;
+    if( !defined( &Foswiki::Func::eachChangeSince )) {
+        require Foswiki::Contrib::MailerContrib::CompatibilityHacks;
     }
 
     # + 1 because the 'since' check is >=
-    my $it = TWiki::Func::eachChangeSince( $web, $timeOfLastNotify + 1 );
+    my $it = Foswiki::Func::eachChangeSince( $web, $timeOfLastNotify + 1 );
     while( $it->hasNext() ) {
         my $change = $it->next();
         next if $change->{more} && $change->{more} =~ /minor$/;
 
-        next unless TWiki::Func::topicExists( $web, $change->{topic} );
+        next unless Foswiki::Func::topicExists( $web, $change->{topic} );
 
         $timeOfLastChange = $change->{time} unless( $timeOfLastChange );
 
         print "\tChange to $change->{topic} at ".
-          TWiki::Time::formatTime( $change->{time}, 'iso' ).
+          Foswiki::Time::formatTime( $change->{time}, 'iso' ).
               ". New revision is $change->{revision}\n" if ( $verbose );
 
         # Formulate a change record, irrespective of
         # whether any subscriber is interested
-        $change = new TWiki::Contrib::MailerContrib::Change(
+        $change = new Foswiki::Contrib::MailerContrib::Change(
             $twiki, $web, $change->{topic}, $change->{user},
             $change->{time}, $change->{revision} );
 
@@ -299,14 +299,14 @@ sub _processSubscriptions {
     }
     # For each topic, see if there's a compulsory subscription independent
     # of the time since last notify
-    foreach my $topic (TWiki::Func::getTopicList($web)) {
+    foreach my $topic (Foswiki::Func::getTopicList($web)) {
         $notify->processCompulsory( $topic, $db, \%allSet );
     }
 
     # Now generate emails for each recipient
     my $report = _sendChangesMails(
         $twiki, $web, \%changeset,
-        TWiki::Time::formatTime($timeOfLastNotify) );
+        Foswiki::Time::formatTime($timeOfLastNotify) );
 
     $report .= _sendNewsletterMails( $twiki, $web, \%allSet);
 
@@ -325,23 +325,23 @@ sub _sendChangesMails {
     my ( $twiki, $web, $changeset, $lastTime ) = @_;
     my $report = '';
 
-    my $skin = TWiki::Func::getSkin();
-    my $template = TWiki::Func::readTemplate( 'mailnotify', $skin );
+    my $skin = Foswiki::Func::getSkin();
+    my $template = Foswiki::Func::readTemplate( 'mailnotify', $skin );
 
-    my $homeTopic = $TWiki::cfg{HomeTopicName};
+    my $homeTopic = $Foswiki::cfg{HomeTopicName};
 
-    my $before_html = TWiki::Func::expandTemplate( 'HTML:before' );
-    my $middle_html = TWiki::Func::expandTemplate( 'HTML:middle' );
-    my $after_html = TWiki::Func::expandTemplate( 'HTML:after' );
+    my $before_html = Foswiki::Func::expandTemplate( 'HTML:before' );
+    my $middle_html = Foswiki::Func::expandTemplate( 'HTML:middle' );
+    my $after_html = Foswiki::Func::expandTemplate( 'HTML:after' );
 
-    my $before_plain = TWiki::Func::expandTemplate( 'PLAIN:before' );
-    my $middle_plain = TWiki::Func::expandTemplate( 'PLAIN:middle' );
-    my $after_plain = TWiki::Func::expandTemplate( 'PLAIN:after' );
+    my $before_plain = Foswiki::Func::expandTemplate( 'PLAIN:before' );
+    my $middle_plain = Foswiki::Func::expandTemplate( 'PLAIN:middle' );
+    my $after_plain = Foswiki::Func::expandTemplate( 'PLAIN:after' );
 
-    my $mailtmpl = TWiki::Func::expandTemplate( 'MailNotifyBody' );
-    $mailtmpl = TWiki::Func::expandCommonVariables(
+    my $mailtmpl = Foswiki::Func::expandTemplate( 'MailNotifyBody' );
+    $mailtmpl = Foswiki::Func::expandCommonVariables(
         $mailtmpl, $homeTopic, $web );
-    if( $TWiki::cfg{RemoveImgInMailnotify} ) {
+    if( $Foswiki::cfg{RemoveImgInMailnotify} ) {
         # change images to [alt] text if there, else remove image
         $mailtmpl =~ s/<img\s[^>]*\balt=\"([^\"]+)[^>]*>/[$1]/goi;
         $mailtmpl =~ s/<img src=.*?[^>]>//goi;
@@ -359,7 +359,7 @@ sub _sendChangesMails {
             $plain .= $change->expandPlain( $middle_plain );
         }
 
-        $plain =~ s/\($TWiki::cfg{UsersWebName}\./\(/go;
+        $plain =~ s/\($Foswiki::cfg{UsersWebName}\./\(/go;
 
         my $mail = $mailtmpl;
 
@@ -367,16 +367,16 @@ sub _sendChangesMails {
         $mail =~ s/%HTML_TEXT%/$before_html$html$after_html/go;
         $mail =~ s/%PLAIN_TEXT%/$before_plain$plain$after_plain/go;
         $mail =~ s/%LASTDATE%/$lastTime/geo;
-        $mail = TWiki::Func::expandCommonVariables( $mail, $homeTopic, $web );
+        $mail = Foswiki::Func::expandCommonVariables( $mail, $homeTopic, $web );
 
-        my $base = $TWiki::cfg{DefaultUrlHost} . $TWiki::cfg{ScriptUrlPath};
+        my $base = $Foswiki::cfg{DefaultUrlHost} . $Foswiki::cfg{ScriptUrlPath};
         $mail =~ s/(href=\")([^"]+)/$1.relativeURL($base,$2)/goei;
         $mail =~ s/(action=\")([^"]+)/$1.relativeURL($base,$2)/goei;
 
         # remove <nop> and <noautolink> tags
         $mail =~ s/( ?) *<\/?(nop|noautolink)\/?>\n?/$1/gois;
 
-        my $error = TWiki::Func::sendEmail( $mail, 5 );
+        my $error = Foswiki::Func::sendEmail( $mail, 5 );
 
         if ($error) {
             print STDERR "Error sending mail forf $web: $error\n";
@@ -409,26 +409,26 @@ sub _sendNewsletterMails {
 
 sub _sendNewsletterMail {
     my ($twiki, $web, $topic, $emails) = @_;
-    my $wikiName = TWiki::Func::getWikiName();
+    my $wikiName = Foswiki::Func::getWikiName();
 
     # SMELL: this code is almost identical to PublishContrib
 
     # Read topic data.
-    my ($meta, $text) = TWiki::Func::readTopic( $web, $topic );
+    my ($meta, $text) = Foswiki::Func::readTopic( $web, $topic );
 
-    if (!defined( &TWiki::Func::pushTopicContext )) {
-        require TWiki::Contrib::MailerContrib::TopicContext;
+    if (!defined( &Foswiki::Func::pushTopicContext )) {
+        require Foswiki::Contrib::MailerContrib::TopicContext;
     }
-    TWiki::Func::pushTopicContext( $web, $topic );
+    Foswiki::Func::pushTopicContext( $web, $topic );
 
     $twiki->enterContext( 'can_render_meta', $meta );
 
     # Get the skin for this topic
-    my $skin = TWiki::Func::getSkin();
-    TWiki::Func::readTemplate( 'newsletter', $skin );
-    my $header = TWiki::Func::expandTemplate( 'NEWS:header' );
-    my $body = TWiki::Func::expandTemplate( 'NEWS:body' );
-    my $footer = TWiki::Func::expandTemplate( 'NEWS:footer' );
+    my $skin = Foswiki::Func::getSkin();
+    Foswiki::Func::readTemplate( 'newsletter', $skin );
+    my $header = Foswiki::Func::expandTemplate( 'NEWS:header' );
+    my $body = Foswiki::Func::expandTemplate( 'NEWS:body' );
+    my $footer = Foswiki::Func::expandTemplate( 'NEWS:footer' );
 
     my ($revdate, $revuser, $maxrev);
     ($revdate, $revuser, $maxrev) = $meta->getRevisionInfo();
@@ -436,10 +436,10 @@ sub _sendNewsletterMail {
     # Handle standard formatting.
     $body =~ s/%TEXT%/$text/g;
     # Don't render the header, it is preformatted
-    $header = TWiki::Func::expandCommonVariables($header, $topic, $web);
+    $header = Foswiki::Func::expandCommonVariables($header, $topic, $web);
     my $tmpl = "$body\n$footer";
-    $tmpl = TWiki::Func::expandCommonVariables($tmpl, $topic, $web);
-    $tmpl = TWiki::Func::renderText($tmpl, "", $meta);
+    $tmpl = Foswiki::Func::expandCommonVariables($tmpl, $topic, $web);
+    $tmpl = Foswiki::Func::renderText($tmpl, "", $meta);
     $tmpl = "$header$tmpl";
 
     # REFACTOR OPPORTUNITY: stop factor me into getTWikiRendering()
@@ -474,7 +474,7 @@ sub _sendNewsletterMail {
     $tmpl =~ s/<base[^>]+>.*?<\/base>//;
 
     # Rewrite absolute URLs
-    my $base = $TWiki::cfg{DefaultUrlHost} . $TWiki::cfg{ScriptUrlPath};
+    my $base = $Foswiki::cfg{DefaultUrlHost} . $Foswiki::cfg{ScriptUrlPath};
     $tmpl =~ s/(href=\")([^"]+)/$1.relativeURL($base,$2)/goei;
     $tmpl =~ s/(action=\")([^"]+)/$1.relativeURL($base,$2)/goei;
 
@@ -488,14 +488,14 @@ sub _sendNewsletterMail {
 
         $mail =~ s/%EMAILTO%/$email/go;
 
-        my $base = $TWiki::cfg{DefaultUrlHost} . $TWiki::cfg{ScriptUrlPath};
+        my $base = $Foswiki::cfg{DefaultUrlHost} . $Foswiki::cfg{ScriptUrlPath};
         $mail =~ s/(href=\")([^"]+)/$1.relativeURL($base,$2)/goei;
         $mail =~ s/(action=\")([^"]+)/$1.relativeURL($base,$2)/goei;
 
         # remove <nop> and <noautolink> tags
         $mail =~ s/( ?) *<\/?(nop|noautolink)\/?>\n?/$1/gois;
 
-        my $error = TWiki::Func::sendEmail( $mail, 5 );
+        my $error = Foswiki::Func::sendEmail( $mail, 5 );
 
         if ($error) {
             print STDERR "Error sending mail for $web: $error\n";
@@ -507,7 +507,7 @@ sub _sendNewsletterMail {
     }
     $report .= "\t$sentMails newsletters from $web\n";
 
-    TWiki::Func::popTopicContext();
+    Foswiki::Func::popTopicContext();
 
     return $report;
 }

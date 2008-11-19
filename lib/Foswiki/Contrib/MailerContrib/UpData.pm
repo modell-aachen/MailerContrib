@@ -1,8 +1,8 @@
 # Module of Foswiki - The Free Open Source Wiki, http://foswiki.org/
 #
 # Copyright (C) 2004 Wind River Systems Inc.
-# Copyright (C) 1999-2006 TWiki Contributors.
-# All Rights Reserved. TWiki Contributors
+# Copyright (C) 1999-2006 Foswiki Contributors.
+# All Rights Reserved. Foswiki Contributors
 # are listed in the AUTHORS file in the root of this distribution.
 # NOTE: Please extend that file, not this notice.
 #
@@ -22,13 +22,13 @@ use strict;
 
 =pod
 
----+ package TWiki::Contrib::MailerContrib::UpData
+---+ package Foswiki::Contrib::MailerContrib::UpData
 Object that lazy-scans topics to extract
 parent relationships.
 
 =cut
 
-package TWiki::Contrib::MailerContrib::UpData;
+package Foswiki::Contrib::MailerContrib::UpData;
 
 =pod
 
@@ -59,7 +59,7 @@ sub getParent {
 
     if ( ! defined( $this->{parent}{$topic} )) {
         my( $meta, $text ) =
-          TWiki::Func::readTopic( $this->{web}, $topic );
+          Foswiki::Func::readTopic( $this->{web}, $topic );
         my $parent = $meta->get('TOPICPARENT');
         $this->{parent}{$topic} = $parent->{name} if $parent;
         $this->{parent}{$topic} ||= '';
