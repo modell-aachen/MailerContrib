@@ -371,6 +371,9 @@ sub _load {
     $this->{posttext} = '';
     $this->{meta}     = $meta;
 
+    # process %STARTEXPAND%...%ENDEXPAND%
+    $text =~ s#%STARTEXPAND(?:{\s*})?%(.*?)%(?:STOP|END)EXPAND(?:{\s*})?%#Foswiki::Func::expandCommonVariables($1, $this->{topic}, $this->{text}, $meta)#ges;
+
     # join \ terminated lines
     $text =~ s/\\\r?\n//gs;
     my $webRE    = qr/(?:$Foswiki::cfg{UsersWebName}\.)?/;

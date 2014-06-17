@@ -49,6 +49,7 @@ Users may further customize the specific content they will receive using the fol
    * *Unsubscribing to specific topics* - Each topic may optionally be preceded by a '+' or '-' sign. The '+' sign means "subscribe to this topic". The '-' sign means "unsubscribe" or "don't send notifications regarding this particular topic". This allows users to elect to filter out certain topics. Topic filters ('-') take precedence over topic includes ('+') i.e. if you unsubscribe from a topic it will cancel out any subscriptions to that topic.
    * *Including child-topics in subscription* - Each topic may optionally be followed by an integer in parentheses, indicating the depth of the tree of children below that topic. Changes in all these children will be detected and reported along with changes to the topic itself. _Note_ This uses the Foswiki "Topic parent" feature.
    * *Subscribing to entire topic ("news mode")* - Each topic may optionally be immediately followed by an exclamation mark ! and/or a question mark ? with no intervening spaces, indicating that the topic (and children if there is a tree depth specifier as well) should be mailed out as *complete topics* instead of change summaries. ! causes the full topic to be mailed every time _even if there have been no changes_, and ? will mail the full topic only if there have been changes. One can limit the content of the subscribed topic to send out by inserting =%<nop>STARTPUBLISH%= and =%<nop>STOPPUBLISH%= markers within the topic.
+   * *Macro expansion* - Macros within =%<nop>STARTEXPAND%...%<nop>ENDEXPAND%= will be expanded prior to parsing the topic. You can use this to dynamically create user lists. Macros outside these markers will still be expanded, however they may only span a single line (and thus only subscribe a single user/group).
 
 Examples:
 Subscribe Daisy to all changes to topics in this web.
@@ -83,6 +84,30 @@ Subscribe !GardenGroup (which includes Petunia) to all changed topics under =All
 Subscribe =IT:admins= (a non-Foswiki group defined by an alternate user mapping) to all changes to Web* topics.
 <verbatim class="tml">
    * 'IT:admins' : Web*
+</verbatim>
+Use =SolrPlugin= to subscribe people inserted into =Subscribers= form-field.
+<verbatim class="tml">
+%STARTEXPAND%
+%SOLRSEARCH{"web: %WEB% field_Subscribers_lst: *"
+ facets="field_Subscribers_lst"
+ format_field_Subscribers_lst="   * $key: $percentSOLRSEARCH{\"web: %WEB% field_Subscribers_lst: $key\"
+  format=\"$dollarwebtopic\"
+  separator=\" \"
+  fields=\"webtopic\"
+ }$percent$n"
+ fields="field_Subscribers_lst"
+}%
+%ENDEXPAND%
+</verbatim>
+Subscribe by FavoritesPlugin
+<verbatim>
+%STARTEXPAND%
+%SOLRSEARCH{"web: %USERSWEB% form: *UserForm"
+ format="$percentFAVORITELIST{web=\"%WEB%\" user=\"$topic\" format=\"$dollartopic\" separator=\" \" header=\"   * $topic: \" footer=\"$n\"}$percent"
+ rows="9999"
+ fields="topic"
+}%
+%ENDEXPAND%
 </verbatim>
 
 A user may be listed many times in the <nop>%NOTIFYTOPIC% topic. Where a user has several lines in <nop>%NOTIFYTOPIC% that all match the same topic, they will only be notified about _changes_ in that topic _once_ (though they will still receive individual mails for news topics).
